@@ -28,8 +28,8 @@ func (repository *StudentRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, s
 	return student
 }
 func (repository *StudentRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, student *domain.Student) *domain.Student {
-	query := "UPDATE student SET name = ?, email = ?, active = ?, semester = ?"
-	result, err := tx.ExecContext(ctx, query, student.Name, student.Email, student.Active, student.Semester)
+	query := "UPDATE student SET name = ?, email = ?, active = ?, semester = ? WHERE id = ?"
+	result, err := tx.ExecContext(ctx, query, student.Name, student.Email, student.Active, student.Semester, student.Id)
 	helper.PanicIfError(err)
 
 	id, err := result.LastInsertId()
