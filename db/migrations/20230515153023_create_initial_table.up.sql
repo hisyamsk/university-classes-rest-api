@@ -6,17 +6,17 @@ CREATE TABLE student(
   semester INTEGER NOT NULL
 );
 
-CREATE TABLE class_detail(
+CREATE TABLE class(
   id SERIAL PRIMARY KEY,
   name VARCHAR(254) NOT NULL,
   start_at TIME NOT NULL,
   end_at TIME NOT NULL
 );
 
-CREATE TABLE class(
+CREATE TABLE enrolled_class(
   id SERIAL PRIMARY KEY,
   student_id INTEGER,
-  class_detail_id INTEGER,
+  class_id INTEGER,
   FOREIGN KEY (student_id) REFERENCES student,
-  FOREIGN KEY (class_detail_id) REFERENCES class_detail
+  FOREIGN KEY (class_id) REFERENCES class
 );
