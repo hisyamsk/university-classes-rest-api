@@ -4,13 +4,13 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/hisyamsk/university-classes-rest-api/model/domain"
+	"github.com/hisyamsk/university-classes-rest-api/entity"
 )
 
 type StudentRepository interface {
-	Save(ctx context.Context, tx *sql.Tx, student *domain.Student) *domain.Student
-	Update(ctx context.Context, tx *sql.Tx, student *domain.Student) *domain.Student
+	Save(ctx context.Context, tx *sql.Tx, student *entity.Student) *entity.Student
+	Update(ctx context.Context, tx *sql.Tx, student *entity.Student) *entity.Student
 	Delete(ctx context.Context, tx *sql.Tx, studentId int)
-	FindById(ctx context.Context, tx *sql.Tx, studentId int) (*domain.Student, error)
-	FindAll(ctx context.Context, tx *sql.Tx, student *domain.Student) []*domain.Student
+	FindById(ctx context.Context, tx *sql.Tx, studentId int) (*entity.Student, error)
+	FindAll(ctx context.Context, tx *sql.Tx, student *entity.Student) []*entity.Student
 }

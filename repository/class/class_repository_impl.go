@@ -5,14 +5,18 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/hisyamsk/university-classes-rest-api/entity"
 	"github.com/hisyamsk/university-classes-rest-api/helper"
-	"github.com/hisyamsk/university-classes-rest-api/model/domain"
 )
 
 type ClassRepositoryImpl struct {
 }
 
-func (repository *ClassRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, class *domain.Class) *domain.Class {
+func NewClassRepositoryImpl() *ClassRepositoryImpl {
+	return &ClassRepositoryImpl{}
+}
+
+func (repository *ClassRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, class *entity.Class) *entity.Class {
 	query := "INSERT INTO class(name, start_at, end_at) VALUES(?, ?, ? )"
 	result, err := tx.ExecContext(ctx, query, class.Name, class.StartAt, class.EndAt)
 	helper.PanicIfError(err)
@@ -24,7 +28,7 @@ func (repository *ClassRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, cla
 	return class
 }
 
-func (repository *ClassRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, class *domain.Class) *domain.Class {
+func (repository *ClassRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, class *entity.Class) *entity.Class {
 	query := "UPDATE class SET name = ?, start_at = ?, end_at = ? WHERE id = ?"
 	result, err := tx.ExecContext(ctx, query, class.Name, class.StartAt, class.EndAt)
 	helper.PanicIfError(err)
@@ -42,14 +46,14 @@ func (repository *ClassRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, c
 	helper.PanicIfError(err)
 }
 
-func (repository *ClassRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, classId int) (*domain.Class, error) {
+func (repository *ClassRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, classId int) (*entity.Class, error) {
 	query := "SELECT id, name, start_at, end_at FROM class WHERE id = ?"
 	rows, err := tx.QueryContext(ctx, query, classId)
 	helper.PanicIfError(err)
 	defer rows.Close()
 
 	if rows.Next() {
-		class := &domain.Class{}
+		class := &entity.Class{}
 		err := rows.Scan(&class.Id, &class.Name, &class.StartAt, &class.EndAt)
 		helper.PanicIfError(err)
 		return class, nil
@@ -58,15 +62,15 @@ func (repository *ClassRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx,
 	return nil, fmt.Errorf("Class with id: %d was not found", classId)
 }
 
-func (repository *ClassRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, class *domain.Class) []*domain.Class {
+func (repository *ClassRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, class *entity.Class) []*entity.Class {
 	query := "SELECT id, name, start_at, end_at FROM class"
 	rows, err := tx.QueryContext(ctx, query)
 	helper.PanicIfError(err)
 	defer rows.Close()
 
-	var classes []*domain.Class
+	var classes []*entity.Class
 	for rows.Next() {
-		class := &domain.Class{}
+		class := &entity.Class{}
 		err := rows.Scan(&class.Id, &class.Name, &class.StartAt, &class.EndAt)
 		helper.PanicIfError(err)
 

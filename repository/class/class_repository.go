@@ -4,13 +4,13 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/hisyamsk/university-classes-rest-api/model/domain"
+	"github.com/hisyamsk/university-classes-rest-api/entity"
 )
 
 type ClassRepository interface {
-	Save(ctx context.Context, tx *sql.Tx, class *domain.Class) *domain.Class
-	Update(ctx context.Context, tx *sql.Tx, class *domain.Class) *domain.Class
+	Save(ctx context.Context, tx *sql.Tx, class *entity.Class) *entity.Class
+	Update(ctx context.Context, tx *sql.Tx, class *entity.Class) *entity.Class
 	Delete(ctx context.Context, tx *sql.Tx, classId int)
-	FindById(ctx context.Context, tx *sql.Tx, classId int) (*domain.Class, error)
-	FindAll(ctx context.Context, tx *sql.Tx, class *domain.Class) []*domain.Class
+	FindById(ctx context.Context, tx *sql.Tx, classId int) (*entity.Class, error)
+	FindAll(ctx context.Context, tx *sql.Tx, class *entity.Class) []*entity.Class
 }
