@@ -190,42 +190,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
 
-  /enrolled-classes/{enrolledClassId}:
-    get:
-      tags:
-        - 'Enrolled Classes'
-      summary: Get all enrolled classes
-      responses:
-        200:
-          description: Success get enrolled class with Id parameter
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: number
-                    example: 200
-                  status:
-                    type: string
-                    example: OK
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/EnrolledClasses'
-        404:
-          description: Failed to get enrolled class with Id parameter
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundError'
-        500:
-          description: Failed to get all enrolled classes due to internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalServerError'
-
   /classes:
     get:
       tags:
@@ -359,7 +323,50 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
-
+  /classes/{classId}/students:
+    get:
+      tags:
+        - "Classes"
+      summary: Get list of enrolled students with classId parameter
+      parameters:
+        - $ref: '#components/parameters/classId'
+      responses:
+        200:
+          description: Success to get the enrolled students with classId parameter
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: string
+                    example: OK
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                        studentId: 
+                          type: number
+                        studentName:
+                          type: string
+        404:
+          description: Failed to get list of enrolled students due to classId is non existent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        500:
+          description: Failed to get class with id parameter due to internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
 components:
   schemas:
     Students:
