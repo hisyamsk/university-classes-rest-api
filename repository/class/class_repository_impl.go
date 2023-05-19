@@ -1,4 +1,4 @@
-package repository
+package class
 
 import (
 	"context"
@@ -17,7 +17,7 @@ func NewClassRepositoryImpl() *ClassRepositoryImpl {
 }
 
 func (repository *ClassRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, class *entity.Class) *entity.Class {
-	query := "INSERT INTO class(name, start_at, end_at) VALUES(?, ?, ? )"
+	query := "INSERT INTO class(name, start_at, end_at) VALUES($1, $2, $3)"
 	result, err := tx.ExecContext(ctx, query, class.Name, class.StartAt, class.EndAt)
 	helper.PanicIfError(err)
 
@@ -29,7 +29,7 @@ func (repository *ClassRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, cla
 }
 
 func (repository *ClassRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, class *entity.Class) *entity.Class {
-	query := "UPDATE class SET name = ?, start_at = ?, end_at = ? WHERE id = ?"
+	query := "UPDATE class SET name = $1, start_at = $2, end_at = $3 WHERE id = $1"
 	result, err := tx.ExecContext(ctx, query, class.Name, class.StartAt, class.EndAt)
 	helper.PanicIfError(err)
 
@@ -41,13 +41,13 @@ func (repository *ClassRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, c
 }
 
 func (repository *ClassRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, classId int) {
-	query := "DELETE FROM class WHERE id = ?"
+	query := "DELETE FROM class WHERE id = $1"
 	_, err := tx.ExecContext(ctx, query, classId)
 	helper.PanicIfError(err)
 }
 
 func (repository *ClassRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, classId int) (*entity.Class, error) {
-	query := "SELECT id, name, start_at, end_at FROM class WHERE id = ?"
+	query := "SELECT id, name, start_at, end_at FROM class WHERE id = $1"
 	rows, err := tx.QueryContext(ctx, query, classId)
 	helper.PanicIfError(err)
 	defer rows.Close()

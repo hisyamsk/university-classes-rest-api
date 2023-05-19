@@ -1,4 +1,4 @@
-package repository
+package student
 
 import (
 	"context"
@@ -17,7 +17,7 @@ func NewStudentRepository() *StudentRepositoryImpl {
 }
 
 func (repository *StudentRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, student *entity.Student) *entity.Student {
-	query := "INSERT INTO student(name, email, active, semester) VALUES(?, ?, ?, ?)"
+	query := "INSERT INTO student(name, email, active, semester) VALUES($1, $2, $3, $4)"
 	result, err := tx.ExecContext(ctx, query, student.Name, student.Email, student.Active, student.Semester)
 	helper.PanicIfError(err)
 
@@ -28,7 +28,7 @@ func (repository *StudentRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, s
 	return student
 }
 func (repository *StudentRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, student *entity.Student) *entity.Student {
-	query := "UPDATE student SET name = ?, email = ?, active = ?, semester = ? WHERE id = ?"
+	query := "UPDATE student SET name = $1, email = $2, active = $3, semester = $4 WHERE id = $5"
 	result, err := tx.ExecContext(ctx, query, student.Name, student.Email, student.Active, student.Semester, student.Id)
 	helper.PanicIfError(err)
 
@@ -40,13 +40,13 @@ func (repository *StudentRepositoryImpl) Update(ctx context.Context, tx *sql.Tx,
 }
 
 func (repository *StudentRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, studentId int) {
-	query := "DELETE FROM student WHERE id = ?"
+	query := "DELETE FROM student WHERE id = $1"
 	_, err := tx.ExecContext(ctx, query, studentId)
 	helper.PanicIfError(err)
 }
 
 func (repository *StudentRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, studentId int) (*entity.Student, error) {
-	query := "SELECT id, name, email, active, semester FROM student WHERE id = ?"
+	query := "SELECT id, name, email, active, semester FROM student WHERE id = $1"
 	rows, err := tx.QueryContext(ctx, query, studentId)
 	helper.PanicIfError(err)
 	defer rows.Close()
