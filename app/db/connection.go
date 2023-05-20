@@ -7,19 +7,15 @@ import (
 	"time"
 
 	"github.com/hisyamsk/university-classes-rest-api/helper"
-	"github.com/joho/godotenv"
 )
 
-func NewDBConnection() *sql.DB {
-	err := godotenv.Load()
-	helper.PanicIfError(err)
-
-	username := os.Getenv("DB_USERNAME")
-	password := os.Getenv("DB_PASSWORD")
+func NewDBConnection(dbName string) *sql.DB {
+	username := os.Getenv("DB_HOST")
+	password := os.Getenv("DB_HOST")
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
 
-	connStr := fmt.Sprintf("user=%s password=%s dbname=university_classes_db host=%s port=%s sslmode=disable", username, password, host, port)
+	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=disable", username, password, dbName, host, port)
 	db, err := sql.Open("postgres", connStr)
 	helper.PanicIfError(err)
 
