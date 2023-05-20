@@ -1,8 +1,10 @@
 package helper
 
-import "github.com/joho/godotenv"
+import (
+	"github.com/joho/godotenv"
+)
 
-func LoadDotenv() {
-	err := godotenv.Load()
+func LoadDotenv(path string) {
+	err := godotenv.Load(path)
 	PanicIfError(err)
 }

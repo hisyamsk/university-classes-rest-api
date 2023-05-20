@@ -10,8 +10,9 @@ import (
 )
 
 func NewDBConnection(dbName string) *sql.DB {
-	username := os.Getenv("DB_HOST")
-	password := os.Getenv("DB_HOST")
+	helper.LoadDotenv("../../.env")
+	username := os.Getenv("DB_USERNAME")
+	password := os.Getenv("DB_PASSWORD")
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
 
