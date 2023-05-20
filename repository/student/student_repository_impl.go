@@ -17,25 +17,19 @@ func NewStudentRepository() *StudentRepositoryImpl {
 }
 
 func (repository *StudentRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, student *entity.Student) *entity.Student {
-	query := "INSERT INTO student(name, email, active, semester) VALUES($1, $2, $3, $4)"
-	result, err := tx.ExecContext(ctx, query, student.Name, student.Email, student.Active, student.Semester)
+	query := "INSERT INTO student(name, email, active, semester) VALUES($1, $2, $3, $4) RETURNING id"
+	row := tx.QueryRowContext(ctx, query, student.Name, student.Email, student.Active, student.Semester)
+	err := row.Scan(&student.Id)
 	helper.PanicIfError(err)
 
-	id, err := result.LastInsertId()
-	helper.PanicIfError(err)
-
-	student.Id = int(id)
 	return student
 }
 func (repository *StudentRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, student *entity.Student) *entity.Student {
-	query := "UPDATE student SET name = $1, email = $2, active = $3, semester = $4 WHERE id = $5"
-	result, err := tx.ExecContext(ctx, query, student.Name, student.Email, student.Active, student.Semester, student.Id)
+	query := "UPDATE student SET name = $1, email = $2, active = $3, semester = $4 WHERE id = $5 RETURNING id"
+	row := tx.QueryRowContext(ctx, query, student.Name, student.Email, student.Active, student.Semester, student.Id)
+	err := row.Scan(&student.Id)
 	helper.PanicIfError(err)
 
-	id, err := result.LastInsertId()
-	helper.PanicIfError(err)
-
-	student.Id = int(id)
 	return student
 }
 
@@ -61,7 +55,7 @@ func (repository *StudentRepositoryImpl) FindById(ctx context.Context, tx *sql.T
 	return nil, fmt.Errorf("Student with id: %d not found", studentId)
 }
 
-func (repository *StudentRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, student *entity.Student) []*entity.Student {
+func (repository *StudentRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []*entity.Student {
 	query := "SELECT id, name, email, active, semester FROM student"
 	rows, err := tx.QueryContext(ctx, query)
 	helper.PanicIfError(err)
