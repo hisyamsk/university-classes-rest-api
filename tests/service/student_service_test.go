@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"testing"
 
+	"github.com/hisyamsk/university-classes-rest-api/entity"
+	"github.com/hisyamsk/university-classes-rest-api/helper"
 	web "github.com/hisyamsk/university-classes-rest-api/model/web/student"
 	studentRepository "github.com/hisyamsk/university-classes-rest-api/repository/student"
 	"github.com/hisyamsk/university-classes-rest-api/service/student"
@@ -12,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func newStudentService(db *sql.DB) *student.StudentServiceImpl {
+func newStudentService(db *sql.DB) student.StudentService {
 	studentRepository := studentRepository.NewStudentRepository()
 	studentService := student.NewStudentService(studentRepository, db)
 
@@ -90,4 +92,17 @@ func TestStudentServiceDelete(t *testing.T) {
 
 	assert.Nil(t, result)
 	assert.NotNil(t, err)
+}
+
+func TestStudentServiceFindClasses(t *testing.T) {
+	tx, db := tests.SetupTestDB()
+	defer tests.CleanUpTest(tx, db)
+
+	studentService := newStudentService(db)
+	_, classes := tests.PopulateEnrolledClassTable()
+	expected := helper.ToClassesResponse([]*entity.Class{classes[0]})
+
+	result := studentService.FindClasses(context.Background(), 1)
+
+	assert.Equal(t, expected, result)
 }

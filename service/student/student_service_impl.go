@@ -6,7 +6,8 @@ import (
 
 	"github.com/hisyamsk/university-classes-rest-api/entity"
 	"github.com/hisyamsk/university-classes-rest-api/helper"
-	web "github.com/hisyamsk/university-classes-rest-api/model/web/student"
+	webClass "github.com/hisyamsk/university-classes-rest-api/model/web/class"
+	webStudent "github.com/hisyamsk/university-classes-rest-api/model/web/student"
 	"github.com/hisyamsk/university-classes-rest-api/repository/student"
 )
 
@@ -22,7 +23,7 @@ func NewStudentService(repository student.StudentRepository, db *sql.DB) *Studen
 	}
 }
 
-func (service *StudentServiceImpl) Create(ctx context.Context, req *web.StudentCreateRequest) *web.StudentResponse {
+func (service *StudentServiceImpl) Create(ctx context.Context, req *webStudent.StudentCreateRequest) *webStudent.StudentResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
@@ -32,7 +33,7 @@ func (service *StudentServiceImpl) Create(ctx context.Context, req *web.StudentC
 
 	return helper.ToStudentResponse(student)
 }
-func (service *StudentServiceImpl) Update(ctx context.Context, req *web.StudentUpdateRequest) *web.StudentResponse {
+func (service *StudentServiceImpl) Update(ctx context.Context, req *webStudent.StudentUpdateRequest) *webStudent.StudentResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
@@ -49,7 +50,7 @@ func (service *StudentServiceImpl) Delete(ctx context.Context, studentId int) {
 
 	service.StudentRepository.Delete(ctx, tx, studentId)
 }
-func (service *StudentServiceImpl) FindById(ctx context.Context, studentId int) (*web.StudentResponse, error) {
+func (service *StudentServiceImpl) FindById(ctx context.Context, studentId int) (*webStudent.StudentResponse, error) {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
@@ -61,11 +62,20 @@ func (service *StudentServiceImpl) FindById(ctx context.Context, studentId int) 
 
 	return helper.ToStudentResponse(student), nil
 }
-func (service *StudentServiceImpl) FindAll(ctx context.Context) []*web.StudentResponse {
+func (service *StudentServiceImpl) FindAll(ctx context.Context) []*webStudent.StudentResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
 	students := service.StudentRepository.FindAll(ctx, tx)
 	return helper.ToStudentsResponse(students)
+}
+
+func (service *StudentServiceImpl) FindClasses(ctx context.Context, studentId int) []*webClass.ClassResponse {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	enrolledClasses := service.StudentRepository.FindClassesById(ctx, tx, studentId)
+	return helper.ToClassesResponse(enrolledClasses)
 }
