@@ -15,6 +15,15 @@ func NewEnrolledClassRepository() *EnrolledClassRepositoryImpl {
 	return &EnrolledClassRepositoryImpl{}
 }
 
+func (repository *EnrolledClassRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, enrolledClass *entity.EnrolledClass) *entity.EnrolledClass {
+	query := "INSERT INTO enrolled_class(student_id, class_id) VALUES ($1, $2) RETURNING id"
+	row := tx.QueryRowContext(ctx, query, enrolledClass.StudentId, enrolledClass.ClassId)
+	err := row.Scan(&enrolledClass.Id)
+	helper.PanicIfError(err)
+
+	return enrolledClass
+}
+
 func (repository *EnrolledClassRepositoryImpl) FindByClassId(ctx context.Context, tx *sql.Tx, classId int) []*entity.Student {
 	query := "SELECT student.id, student.name, student.email, student.active, student.semester FROM enrolled_class JOIN student ON student_id = student.id WHERE class_id = $1"
 	rows, err := tx.QueryContext(ctx, query, classId)
@@ -44,6 +53,8 @@ func (repository *EnrolledClassRepositoryImpl) FindByStudentId(ctx context.Conte
 	for rows.Next() {
 		class := &entity.Class{}
 		err := rows.Scan(&class.Id, &class.Name, &class.StartAt, &class.EndAt)
+		class.StartAt = helper.GetTimeFromString(class.StartAt)
+		class.EndAt = helper.GetTimeFromString(class.EndAt)
 		helper.PanicIfError(err)
 		enrolledClasses = append(enrolledClasses, class)
 	}
