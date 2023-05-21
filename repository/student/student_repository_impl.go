@@ -24,6 +24,7 @@ func (repository *StudentRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, s
 
 	return student
 }
+
 func (repository *StudentRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, student *entity.Student) *entity.Student {
 	query := "UPDATE student SET name = $1, email = $2, active = $3, semester = $4 WHERE id = $5 RETURNING id"
 	row := tx.QueryRowContext(ctx, query, student.Name, student.Email, student.Active, student.Semester, student.Id)
@@ -52,7 +53,7 @@ func (repository *StudentRepositoryImpl) FindById(ctx context.Context, tx *sql.T
 		return &student, nil
 	}
 
-	return nil, fmt.Errorf("Student with id: %d not found", studentId)
+	return &student, fmt.Errorf("Student with id: %d not found", studentId)
 }
 
 func (repository *StudentRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []*entity.Student {

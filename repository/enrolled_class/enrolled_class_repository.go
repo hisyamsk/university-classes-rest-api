@@ -1,4 +1,4 @@
-package enrolledclass
+package enrolled_class
 
 import (
 	"context"
