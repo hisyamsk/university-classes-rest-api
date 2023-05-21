@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/hisyamsk/university-classes-rest-api/entity"
+	"github.com/hisyamsk/university-classes-rest-api/repository/enrolled_class"
 	"github.com/hisyamsk/university-classes-rest-api/repository/student"
 	"github.com/hisyamsk/university-classes-rest-api/tests"
 	_ "github.com/lib/pq"
@@ -79,4 +80,20 @@ func TestStudentRepositoryDelete(t *testing.T) {
 	_, err := studentRepository.FindById(context.Background(), tx, createdStudent.Id)
 
 	assert.NotNil(t, err)
+}
+
+func TestStudentRepositoryFindClassesById(t *testing.T) {
+	tx, db := tests.SetupTestDB()
+	defer tests.CleanUpTest(tx, db)
+	_, classes := tests.PopulateStudentAndClassTable()
+
+	enrolledClassRepository := enrolled_class.NewEnrolledClassRepository()
+	newEnrolledClass := &entity.EnrolledClass{StudentId: 1, ClassId: 1}
+	enrolledClassRepository.Save(context.Background(), tx, newEnrolledClass)
+	expected := []*entity.Class{classes[0]}
+	studentRepository := student.NewStudentRepository()
+
+	result := studentRepository.FindClassesById(context.Background(), tx, newEnrolledClass.StudentId)
+
+	assert.Equal(t, expected, result)
 }

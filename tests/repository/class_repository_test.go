@@ -6,6 +6,7 @@ import (
 
 	"github.com/hisyamsk/university-classes-rest-api/entity"
 	"github.com/hisyamsk/university-classes-rest-api/repository/class"
+	"github.com/hisyamsk/university-classes-rest-api/repository/enrolled_class"
 	"github.com/hisyamsk/university-classes-rest-api/tests"
 	"github.com/stretchr/testify/assert"
 )
@@ -79,4 +80,20 @@ func TestClassRepositoryDelete(t *testing.T) {
 	_, err := classRepository.FindById(context.Background(), tx, createdClass.Id)
 
 	assert.NotNil(t, err)
+}
+
+func TestClassRepositoryFindStudentsById(t *testing.T) {
+	tx, db := tests.SetupTestDB()
+	defer tests.CleanUpTest(tx, db)
+	students, _ := tests.PopulateStudentAndClassTable()
+
+	enrolledClassRepository := enrolled_class.NewEnrolledClassRepository()
+	newEnrolledClass := &entity.EnrolledClass{StudentId: 1, ClassId: 1}
+	enrolledClassRepository.Save(context.Background(), tx, newEnrolledClass)
+	expected := []*entity.Student{students[0]}
+	classRepository := class.NewClassRepositoryImpl()
+
+	result := classRepository.FindStudentsById(context.Background(), tx, newEnrolledClass.ClassId)
+
+	assert.Equal(t, expected, result)
 }

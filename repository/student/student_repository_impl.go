@@ -72,3 +72,23 @@ func (repository *StudentRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx
 
 	return students
 }
+
+func (repository *StudentRepositoryImpl) FindClassesById(ctx context.Context, tx *sql.Tx, studentId int) []*entity.Class {
+	query := "SELECT class_id, class.name, class.start_at, class.end_at FROM enrolled_class JOIN class ON class_id = class.id WHERE student_id = $1"
+	rows, err := tx.QueryContext(ctx, query, studentId)
+	helper.PanicIfError(err)
+	defer rows.Close()
+
+	enrolledClasses := []*entity.Class{}
+
+	for rows.Next() {
+		class := &entity.Class{}
+		err := rows.Scan(&class.Id, &class.Name, &class.StartAt, &class.EndAt)
+		class.StartAt = helper.GetTimeFromString(class.StartAt)
+		class.EndAt = helper.GetTimeFromString(class.EndAt)
+		helper.PanicIfError(err)
+		enrolledClasses = append(enrolledClasses, class)
+	}
+
+	return enrolledClasses
+}

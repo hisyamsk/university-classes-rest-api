@@ -13,4 +13,5 @@ type StudentRepository interface {
 	Delete(ctx context.Context, tx *sql.Tx, studentId int)
 	FindById(ctx context.Context, tx *sql.Tx, studentId int) (*entity.Student, error)
 	FindAll(ctx context.Context, tx *sql.Tx) []*entity.Student
+	FindClassesById(ctx context.Context, tx *sql.Tx, studentId int) []*entity.Class
 }
