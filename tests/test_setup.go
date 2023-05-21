@@ -6,6 +6,7 @@ import (
 	"github.com/hisyamsk/university-classes-rest-api/app"
 	"github.com/hisyamsk/university-classes-rest-api/app/db"
 	"github.com/hisyamsk/university-classes-rest-api/helper"
+	_ "github.com/lib/pq"
 )
 
 func SetupTestDB() (*sql.Tx, *sql.DB) {

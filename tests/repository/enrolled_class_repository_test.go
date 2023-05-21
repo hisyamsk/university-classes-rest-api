@@ -7,7 +7,7 @@ import (
 	"github.com/hisyamsk/university-classes-rest-api/entity"
 	"github.com/hisyamsk/university-classes-rest-api/helper"
 	"github.com/hisyamsk/university-classes-rest-api/repository/class"
-	enrolledclass "github.com/hisyamsk/university-classes-rest-api/repository/enrolled_class"
+	"github.com/hisyamsk/university-classes-rest-api/repository/enrolled_class"
 	"github.com/hisyamsk/university-classes-rest-api/repository/student"
 	"github.com/hisyamsk/university-classes-rest-api/tests"
 	"github.com/stretchr/testify/assert"
@@ -48,7 +48,7 @@ func TestEnrolledClassRepositorySave(t *testing.T) {
 	populateStudentAndClassTable()
 	newEnrolledClass := &entity.EnrolledClass{StudentId: 1, ClassId: 1}
 	expected := &entity.EnrolledClass{Id: 1, StudentId: 1, ClassId: 1}
-	enrolledClassRepository := enrolledclass.NewEnrolledClassRepository()
+	enrolledClassRepository := enrolled_class.NewEnrolledClassRepository()
 
 	result := enrolledClassRepository.Save(context.Background(), tx, newEnrolledClass)
 
@@ -59,7 +59,7 @@ func TestEnrolledClassRepositoryFindByStudentId(t *testing.T) {
 	tx, db := tests.SetupTestDB()
 	defer tests.CleanUpTest(tx, db)
 	_, classes := populateStudentAndClassTable()
-	enrolledClassRepository := enrolledclass.NewEnrolledClassRepository()
+	enrolledClassRepository := enrolled_class.NewEnrolledClassRepository()
 	newEnrolledClass := &entity.EnrolledClass{StudentId: 1, ClassId: 1}
 	enrolledClassRepository.Save(context.Background(), tx, newEnrolledClass)
 	expected := []*entity.Class{classes[0]}
@@ -73,7 +73,7 @@ func TestEnrolledClassRepositoryFindByClassId(t *testing.T) {
 	tx, db := tests.SetupTestDB()
 	defer tests.CleanUpTest(tx, db)
 	students, _ := populateStudentAndClassTable()
-	enrolledClassRepository := enrolledclass.NewEnrolledClassRepository()
+	enrolledClassRepository := enrolled_class.NewEnrolledClassRepository()
 	newEnrolledClass := &entity.EnrolledClass{StudentId: 1, ClassId: 1}
 	enrolledClassRepository.Save(context.Background(), tx, newEnrolledClass)
 	expected := []*entity.Student{students[0]}
