@@ -1,14 +1,14 @@
 package main
 
 import (
-	"fmt"
-
+	"github.com/hisyamsk/university-classes-rest-api/app"
 	"github.com/hisyamsk/university-classes-rest-api/app/db"
+	_ "github.com/joho/godotenv/autoload"
 	_ "github.com/lib/pq"
 )
 
 func main() {
-	db := db.NewDBConnection()
+	dbName := app.DbName
 
-	fmt.Println(db)
+	db.NewDBConnection(dbName)
 }

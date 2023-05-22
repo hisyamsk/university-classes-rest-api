@@ -12,6 +12,6 @@ type ClassRepository interface {
 	Update(ctx context.Context, tx *sql.Tx, class *entity.Class) *entity.Class
 	Delete(ctx context.Context, tx *sql.Tx, classId int)
 	FindById(ctx context.Context, tx *sql.Tx, classId int) (*entity.Class, error)
-	FindAll(ctx context.Context, tx *sql.Tx, class *entity.Class) []*entity.Class
+	FindAll(ctx context.Context, tx *sql.Tx) []*entity.Class
 	FindStudentsById(ctx context.Context, tx *sql.Tx, classId int) []*entity.Student
 }
