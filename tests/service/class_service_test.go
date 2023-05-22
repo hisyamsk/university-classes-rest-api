@@ -2,32 +2,20 @@ package service
 
 import (
 	"context"
-	"database/sql"
 	"testing"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/hisyamsk/university-classes-rest-api/helper"
 	webClass "github.com/hisyamsk/university-classes-rest-api/model/web/class"
 	webStudent "github.com/hisyamsk/university-classes-rest-api/model/web/student"
-	classRepository "github.com/hisyamsk/university-classes-rest-api/repository/class"
-	classService "github.com/hisyamsk/university-classes-rest-api/service/class"
 	"github.com/hisyamsk/university-classes-rest-api/tests"
 	"github.com/stretchr/testify/assert"
 )
-
-func newClassService(db *sql.DB) classService.ClassService {
-	validate := validator.New()
-	classRepository := classRepository.NewClassRepositoryImpl()
-	classService := classService.NewClassService(db, classRepository, validate)
-
-	return classService
-}
 
 func TestClassServiceCreate(t *testing.T) {
 	tx, db := tests.SetupTestDB()
 	defer tests.CleanUpTest(tx, db)
 
-	classService := newClassService(db)
+	classService := tests.NewTestClassService(db)
 	classRequest := &webClass.ClassCreateRequest{Name: "Graph Theory", StartAt: "07:00:00", EndAt: "09:00:00"}
 	expected := &webClass.ClassResponse{Id: 1, Name: "Graph Theory", StartAt: "07:00:00", EndAt: "09:00:00"}
 
@@ -40,7 +28,7 @@ func TestClassServiceFindById(t *testing.T) {
 	tx, db := tests.SetupTestDB()
 	defer tests.CleanUpTest(tx, db)
 
-	classService := newClassService(db)
+	classService := tests.NewTestClassService(db)
 	classRequest := &webClass.ClassCreateRequest{Name: "Graph Theory", StartAt: "07:00:00", EndAt: "09:00:00"}
 	createdClass := classService.Create(context.Background(), classRequest)
 	expected := &webClass.ClassResponse{Id: 1, Name: "Graph Theory", StartAt: "07:00:00", EndAt: "09:00:00"}
@@ -55,7 +43,7 @@ func TestClassServiceUpdate(t *testing.T) {
 	tx, db := tests.SetupTestDB()
 	defer tests.CleanUpTest(tx, db)
 
-	classService := newClassService(db)
+	classService := tests.NewTestClassService(db)
 	classCreateRequest := &webClass.ClassCreateRequest{Name: "Graph Theory", StartAt: "07:00:00", EndAt: "09:00:00"}
 	createdClass := classService.Create(context.Background(), classCreateRequest)
 	classUpdateRequest := &webClass.ClassUpdateRequest{Id: createdClass.Id, Name: createdClass.Name, StartAt: "09:00:00", EndAt: "11:00:00"}
@@ -70,7 +58,7 @@ func TestClassServiceDelete(t *testing.T) {
 	tx, db := tests.SetupTestDB()
 	defer tests.CleanUpTest(tx, db)
 
-	classService := newClassService(db)
+	classService := tests.NewTestClassService(db)
 	classCreateRequest := &webClass.ClassCreateRequest{Name: "Graph Theory", StartAt: "07:00:00", EndAt: "09:00:00"}
 	createdClass := classService.Create(context.Background(), classCreateRequest)
 
@@ -85,7 +73,7 @@ func TestClassServiceFindAll(t *testing.T) {
 	tx, db := tests.SetupTestDB()
 	defer tests.CleanUpTest(tx, db)
 
-	classService := newClassService(db)
+	classService := tests.NewTestClassService(db)
 	classCreateRequest := &webClass.ClassCreateRequest{Name: "Graph Theory", StartAt: "07:00:00", EndAt: "09:00:00"}
 	createdClass := classService.Create(context.Background(), classCreateRequest)
 	expected := []*webClass.ClassResponse{createdClass}
@@ -100,7 +88,7 @@ func TestClassServiceFindStundentsById(t *testing.T) {
 	defer tests.CleanUpTest(tx, db)
 	students, _ := tests.PopulateEnrolledClassTable()
 
-	classService := newClassService(db)
+	classService := tests.NewTestClassService(db)
 	expected := []*webStudent.StudentResponse{helper.ToStudentResponse(students[0])}
 	result := classService.FindStudentsById(context.Background(), 1)
 

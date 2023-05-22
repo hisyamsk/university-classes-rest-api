@@ -4,13 +4,19 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/hisyamsk/university-classes-rest-api/app"
 	"github.com/hisyamsk/university-classes-rest-api/app/db"
+	studentController "github.com/hisyamsk/university-classes-rest-api/controller/student"
 	"github.com/hisyamsk/university-classes-rest-api/entity"
 	"github.com/hisyamsk/university-classes-rest-api/helper"
 	"github.com/hisyamsk/university-classes-rest-api/repository/class"
+	classRepository "github.com/hisyamsk/university-classes-rest-api/repository/class"
 	"github.com/hisyamsk/university-classes-rest-api/repository/enrolled_class"
 	"github.com/hisyamsk/university-classes-rest-api/repository/student"
+	studentRepository "github.com/hisyamsk/university-classes-rest-api/repository/student"
+	classService "github.com/hisyamsk/university-classes-rest-api/service/class"
+	studentService "github.com/hisyamsk/university-classes-rest-api/service/student"
 	_ "github.com/lib/pq"
 )
 
@@ -70,4 +76,27 @@ func PopulateEnrolledClassTable() ([]*entity.Student, []*entity.Class) {
 	}
 
 	return students, classes
+}
+
+func NewTestClassService(db *sql.DB) classService.ClassService {
+	validate := validator.New()
+	classRepository := classRepository.NewClassRepositoryImpl()
+	classService := classService.NewClassService(db, classRepository, validate)
+
+	return classService
+}
+
+func NewTestStudentService(db *sql.DB) studentService.StudentService {
+	validate := validator.New()
+	studentRepository := studentRepository.NewStudentRepository()
+	studentService := studentService.NewStudentService(studentRepository, db, validate)
+
+	return studentService
+}
+
+func NewTestStudentController(db *sql.DB) studentController.StudentController {
+	studentService := NewTestStudentService(db)
+	studentController := studentController.NewStudentController(studentService)
+
+	return studentController
 }
