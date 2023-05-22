@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/hisyamsk/university-classes-rest-api/entity"
 	"github.com/hisyamsk/university-classes-rest-api/helper"
 	webClass "github.com/hisyamsk/university-classes-rest-api/model/web/class"
@@ -14,16 +15,21 @@ import (
 type StudentServiceImpl struct {
 	DB                *sql.DB
 	StudentRepository student.StudentRepository
+	Validate          *validator.Validate
 }
 
-func NewStudentService(repository student.StudentRepository, db *sql.DB) *StudentServiceImpl {
+func NewStudentService(repository student.StudentRepository, db *sql.DB, validate *validator.Validate) *StudentServiceImpl {
 	return &StudentServiceImpl{
 		StudentRepository: repository,
 		DB:                db,
+		Validate:          validate,
 	}
 }
 
 func (service *StudentServiceImpl) Create(ctx context.Context, req *webStudent.StudentCreateRequest) *webStudent.StudentResponse {
+	err := service.Validate.Struct(req)
+	helper.PanicIfError(err)
+
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
@@ -34,6 +40,9 @@ func (service *StudentServiceImpl) Create(ctx context.Context, req *webStudent.S
 	return helper.ToStudentResponse(student)
 }
 func (service *StudentServiceImpl) Update(ctx context.Context, req *webStudent.StudentUpdateRequest) *webStudent.StudentResponse {
+	err := service.Validate.Struct(req)
+	helper.PanicIfError(err)
+
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"testing"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/hisyamsk/university-classes-rest-api/helper"
 	webClass "github.com/hisyamsk/university-classes-rest-api/model/web/class"
 	webStudent "github.com/hisyamsk/university-classes-rest-api/model/web/student"
@@ -15,8 +16,9 @@ import (
 )
 
 func newClassService(db *sql.DB) classService.ClassService {
+	validate := validator.New()
 	classRepository := classRepository.NewClassRepositoryImpl()
-	classService := classService.NewClassService(db, classRepository)
+	classService := classService.NewClassService(db, classRepository, validate)
 
 	return classService
 }
