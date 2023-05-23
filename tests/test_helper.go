@@ -3,6 +3,11 @@ package tests
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/hisyamsk/university-classes-rest-api/app"
@@ -101,4 +106,28 @@ func NewTestStudentController(db *sql.DB) studentController.StudentController {
 	studentController := studentController.NewStudentController(studentService)
 
 	return studentController
+}
+
+func SetupRequestAndRecorder(router http.Handler, body []byte, method, endpoint string) ([]byte, *http.Response) {
+	requestBody := strings.NewReader(string(body))
+	request := httptest.NewRequest(method, fmt.Sprintf("%s/%s", API_URL, endpoint), requestBody)
+	request.Header.Add("Content-Type", "application/json")
+	recorder := httptest.NewRecorder()
+
+	router.ServeHTTP(recorder, request)
+	response := recorder.Result()
+	responseBody, _ := io.ReadAll(response.Body)
+
+	return responseBody, response
+}
+
+func SetupWoy(router http.Handler, body []byte, method, endpoint string) {
+	requestBody := strings.NewReader(string(body))
+	request := httptest.NewRequest(method, fmt.Sprintf("%s/%s", API_URL, endpoint), requestBody)
+	request.Header.Add("Content-Type", "application/json")
+	recorder := httptest.NewRecorder()
+
+	router.ServeHTTP(recorder, request)
+	// response := recorder.Result()
+	// io.ReadAll(response.Body)
 }
