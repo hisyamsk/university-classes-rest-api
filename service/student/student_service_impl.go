@@ -50,7 +50,7 @@ func (service *StudentServiceImpl) Update(ctx context.Context, req *webStudent.S
 
 	_, findErr := service.StudentRepository.FindById(ctx, tx, req.Id)
 	if findErr != nil {
-		panic(exception.NewNotFoundError(err.Error()))
+		panic(exception.NewNotFoundError(findErr.Error()))
 	}
 
 	student := &entity.Student{Id: req.Id, Name: req.Name, Email: req.Email, Active: req.Active, Semester: req.Semester}
@@ -65,7 +65,7 @@ func (service *StudentServiceImpl) Delete(ctx context.Context, studentId int) {
 
 	_, findErr := service.StudentRepository.FindById(ctx, tx, studentId)
 	if findErr != nil {
-		panic(exception.NewNotFoundError(err.Error()))
+		panic(exception.NewNotFoundError(findErr.Error()))
 	}
 
 	service.StudentRepository.Delete(ctx, tx, studentId)
@@ -98,7 +98,7 @@ func (service *StudentServiceImpl) FindClasses(ctx context.Context, studentId in
 
 	_, findErr := service.StudentRepository.FindById(ctx, tx, studentId)
 	if findErr != nil {
-		panic(exception.NewNotFoundError(err.Error()))
+		panic(exception.NewNotFoundError(findErr.Error()))
 	}
 
 	enrolledClasses := service.StudentRepository.FindClassesById(ctx, tx, studentId)
