@@ -40,14 +40,14 @@ func validationError(writer http.ResponseWriter, request *http.Request, err any)
 }
 
 func notFoundError(writer http.ResponseWriter, request *http.Request, err any) bool {
-	exception, ok := err.(NotFoundError)
+	exception, ok := err.(*NotFoundError)
 	if ok {
 		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusBadRequest)
+		writer.WriteHeader(http.StatusNotFound)
 
 		webResponse := &web.WebResponse{
-			Code:   http.StatusBadRequest,
-			Status: http.StatusText(http.StatusBadRequest),
+			Code:   http.StatusNotFound,
+			Status: http.StatusText(http.StatusNotFound),
 			Data:   exception.Error(),
 		}
 
