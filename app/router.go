@@ -14,12 +14,12 @@ func NewRouter(handler *RouterHandler) *httprouter.Router {
 	router := httprouter.New()
 
 	// /students
-	router.GET("/api/students", handler.StudentController.FindAll)
+	router.GET("/api/students", handler.StudentController.GetAll)
 	router.POST("/api/students", handler.StudentController.Create)
-	router.GET("/api/students/:id", handler.StudentController.FindById)
+	router.GET("/api/students/:id", handler.StudentController.GetById)
 	router.PATCH("/api/students/:id", handler.StudentController.Update)
 	router.DELETE("/api/students/:id", handler.StudentController.Delete)
-	router.GET("/api/students/:id/classes", handler.StudentController.FindClassesById)
+	router.GET("/api/students/:id/classes", handler.StudentController.GetClassesById)
 
 	router.PanicHandler = exception.ErrorHandler
 
