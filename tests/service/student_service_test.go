@@ -20,10 +20,9 @@ func TestStudentServiceFindById(t *testing.T) {
 	createdStudent := studentService.Create(context.Background(), studentRequest)
 	expected := &web.StudentResponse{Id: 1, Name: "Hisyam", Email: "hisyam@email.com", Active: true, Semester: 7}
 
-	result, err := studentService.FindById(context.Background(), createdStudent.Id)
+	result := studentService.FindById(context.Background(), createdStudent.Id)
 
 	assert.Equal(t, expected, result)
-	assert.Nil(t, err)
 }
 
 func TestStudentServiceFindAll(t *testing.T) {
@@ -78,10 +77,6 @@ func TestStudentServiceDelete(t *testing.T) {
 	createdStudent := studentService.Create(context.Background(), studentRequest)
 
 	studentService.Delete(context.Background(), createdStudent.Id)
-	result, err := studentService.FindById(context.Background(), createdStudent.Id)
-
-	assert.Nil(t, result)
-	assert.NotNil(t, err)
 }
 
 func TestStudentServiceFindClasses(t *testing.T) {

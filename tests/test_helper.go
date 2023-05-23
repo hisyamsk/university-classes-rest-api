@@ -20,6 +20,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
+const API_URL = "http://localhost:8000/api"
+
 func SetupTestDB() (*sql.Tx, *sql.DB) {
 	database := db.NewDBConnection(app.DbNameTest)
 	tx, err := database.Begin()

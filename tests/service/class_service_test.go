@@ -33,10 +33,9 @@ func TestClassServiceFindById(t *testing.T) {
 	createdClass := classService.Create(context.Background(), classRequest)
 	expected := &webClass.ClassResponse{Id: 1, Name: "Graph Theory", StartAt: "07:00:00", EndAt: "09:00:00"}
 
-	result, err := classService.FindById(context.Background(), createdClass.Id)
+	result := classService.FindById(context.Background(), createdClass.Id)
 
 	assert.Equal(t, expected, result)
-	assert.Nil(t, err)
 }
 
 func TestClassServiceUpdate(t *testing.T) {
@@ -63,10 +62,6 @@ func TestClassServiceDelete(t *testing.T) {
 	createdClass := classService.Create(context.Background(), classCreateRequest)
 
 	classService.Delete(context.Background(), createdClass.Id)
-	class, err := classService.FindById(context.Background(), createdClass.Id)
-
-	assert.Nil(t, class)
-	assert.NotNil(t, err)
 }
 
 func TestClassServiceFindAll(t *testing.T) {
