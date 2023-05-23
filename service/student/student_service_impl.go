@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/hisyamsk/university-classes-rest-api/entity"
+	"github.com/hisyamsk/university-classes-rest-api/exception"
 	"github.com/hisyamsk/university-classes-rest-api/helper"
 	webClass "github.com/hisyamsk/university-classes-rest-api/model/web/class"
 	webStudent "github.com/hisyamsk/university-classes-rest-api/model/web/student"
@@ -47,6 +48,11 @@ func (service *StudentServiceImpl) Update(ctx context.Context, req *webStudent.S
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
+	_, findErr := service.StudentRepository.FindById(ctx, tx, req.Id)
+	if findErr != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
+
 	student := &entity.Student{Id: req.Id, Name: req.Name, Email: req.Email, Active: req.Active, Semester: req.Semester}
 	student = service.StudentRepository.Update(ctx, tx, student)
 
@@ -57,19 +63,24 @@ func (service *StudentServiceImpl) Delete(ctx context.Context, studentId int) {
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
+	_, findErr := service.StudentRepository.FindById(ctx, tx, studentId)
+	if findErr != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
+
 	service.StudentRepository.Delete(ctx, tx, studentId)
 }
-func (service *StudentServiceImpl) FindById(ctx context.Context, studentId int) (*webStudent.StudentResponse, error) {
+func (service *StudentServiceImpl) FindById(ctx context.Context, studentId int) *webStudent.StudentResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
 	student, err := service.StudentRepository.FindById(ctx, tx, studentId)
 	if err != nil {
-		return nil, err
+		panic(exception.NewNotFoundError(err.Error()))
 	}
 
-	return helper.ToStudentResponse(student), nil
+	return helper.ToStudentResponse(student)
 }
 func (service *StudentServiceImpl) FindAll(ctx context.Context) []*webStudent.StudentResponse {
 	tx, err := service.DB.Begin()
@@ -84,6 +95,11 @@ func (service *StudentServiceImpl) FindClasses(ctx context.Context, studentId in
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
+
+	_, findErr := service.StudentRepository.FindById(ctx, tx, studentId)
+	if findErr != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	enrolledClasses := service.StudentRepository.FindClassesById(ctx, tx, studentId)
 	return helper.ToClassesResponse(enrolledClasses)

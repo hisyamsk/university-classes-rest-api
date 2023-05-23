@@ -53,7 +53,7 @@ func (repository *StudentRepositoryImpl) FindById(ctx context.Context, tx *sql.T
 		return &student, nil
 	}
 
-	return &student, fmt.Errorf("Student with id: %d not found", studentId)
+	return &student, fmt.Errorf("Student with id: %d was not found", studentId)
 }
 
 func (repository *StudentRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []*entity.Student {

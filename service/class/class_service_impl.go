@@ -3,10 +3,10 @@ package class
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/hisyamsk/university-classes-rest-api/entity"
+	"github.com/hisyamsk/university-classes-rest-api/exception"
 	"github.com/hisyamsk/university-classes-rest-api/helper"
 	webClass "github.com/hisyamsk/university-classes-rest-api/model/web/class"
 	webStudent "github.com/hisyamsk/university-classes-rest-api/model/web/student"
@@ -49,9 +49,9 @@ func (service *ClassServiceImpl) Update(ctx context.Context, req *webClass.Class
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	_, errClass := service.ClassRepository.FindById(ctx, tx, req.Id)
-	if errClass != nil {
-		helper.PanicIfError(err)
+	_, findErr := service.ClassRepository.FindById(ctx, tx, req.Id)
+	if findErr != nil {
+		panic(exception.NewNotFoundError(findErr.Error()))
 	}
 
 	classEntity := &entity.Class{Id: req.Id, Name: req.Name, StartAt: req.StartAt, EndAt: req.EndAt}
@@ -65,25 +65,25 @@ func (service *ClassServiceImpl) Delete(ctx context.Context, classId int) {
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	_, errClass := service.ClassRepository.FindById(ctx, tx, classId)
-	if errClass != nil {
-		helper.PanicIfError(err)
+	_, findErr := service.ClassRepository.FindById(ctx, tx, classId)
+	if findErr != nil {
+		panic(exception.NewNotFoundError(findErr.Error()))
 	}
 
 	service.ClassRepository.Delete(ctx, tx, classId)
 }
 
-func (service *ClassServiceImpl) FindById(ctx context.Context, classId int) (*webClass.ClassResponse, error) {
+func (service *ClassServiceImpl) FindById(ctx context.Context, classId int) *webClass.ClassResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	class, err := service.ClassRepository.FindById(ctx, tx, classId)
-	if err != nil {
-		return nil, fmt.Errorf("Class with id:%d was not found", classId)
+	class, findErr := service.ClassRepository.FindById(ctx, tx, classId)
+	if findErr != nil {
+		panic(exception.NewNotFoundError(findErr.Error()))
 	}
 
-	return helper.ToClassResponse(class), nil
+	return helper.ToClassResponse(class)
 }
 
 func (service *ClassServiceImpl) FindAll(ctx context.Context) []*webClass.ClassResponse {
@@ -101,6 +101,10 @@ func (service *ClassServiceImpl) FindStudentsById(ctx context.Context, classId i
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
+	_, findErr := service.ClassRepository.FindById(ctx, tx, classId)
+	if findErr != nil {
+		panic(exception.NewNotFoundError(findErr.Error()))
+	}
 	enrolledStudents := service.ClassRepository.FindStudentsById(ctx, tx, classId)
 
 	return helper.ToStudentsResponse(enrolledStudents)

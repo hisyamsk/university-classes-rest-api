@@ -11,7 +11,7 @@ type StudentService interface {
 	Create(ctx context.Context, req *webStudent.StudentCreateRequest) *webStudent.StudentResponse
 	Update(ctx context.Context, req *webStudent.StudentUpdateRequest) *webStudent.StudentResponse
 	Delete(ctx context.Context, studentId int)
-	FindById(ctx context.Context, studentId int) (*webStudent.StudentResponse, error)
+	FindById(ctx context.Context, studentId int) *webStudent.StudentResponse
 	FindAll(ctx context.Context) []*webStudent.StudentResponse
 	FindClasses(ctx context.Context, studentId int) []*webClass.ClassResponse
 }
