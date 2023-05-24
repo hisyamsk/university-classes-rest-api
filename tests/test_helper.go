@@ -3,6 +3,7 @@ package tests
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -16,6 +17,7 @@ import (
 	studentController "github.com/hisyamsk/university-classes-rest-api/controller/student"
 	"github.com/hisyamsk/university-classes-rest-api/entity"
 	"github.com/hisyamsk/university-classes-rest-api/helper"
+	"github.com/hisyamsk/university-classes-rest-api/model/web"
 	"github.com/hisyamsk/university-classes-rest-api/repository/class"
 	classRepository "github.com/hisyamsk/university-classes-rest-api/repository/class"
 	"github.com/hisyamsk/university-classes-rest-api/repository/enrolled_class"
@@ -128,7 +130,7 @@ func SetupTestRouter(db *sql.DB) http.Handler {
 	return router
 }
 
-func SetupRequestAndRecorder(router http.Handler, body []byte, method, endpoint string) ([]byte, *http.Response) {
+func SetupRequestAndRecorder(router http.Handler, body []byte, method, endpoint string) (*web.WebResponse, *http.Response) {
 	requestBody := strings.NewReader(string(body))
 	request := httptest.NewRequest(method, fmt.Sprintf("%s/%s", API_URL, endpoint), requestBody)
 	request.Header.Add("Content-Type", "application/json")
@@ -137,6 +139,9 @@ func SetupRequestAndRecorder(router http.Handler, body []byte, method, endpoint 
 	router.ServeHTTP(recorder, request)
 	response := recorder.Result()
 	responseBody, _ := io.ReadAll(response.Body)
+	var result *web.WebResponse
+	err := json.Unmarshal(responseBody, &result)
+	helper.PanicIfError(err)
 
-	return responseBody, response
+	return result, response
 }
