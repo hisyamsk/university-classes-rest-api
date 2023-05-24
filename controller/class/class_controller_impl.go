@@ -50,7 +50,17 @@ func (controller *ClassControllerImpl) Update(writer http.ResponseWriter, reques
 	helper.WriteToResponseBody(writer, webResponse)
 }
 func (controller *ClassControllerImpl) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	panic("not implemented") // TODO: Implement
+	classId, err := strconv.Atoi(params.ByName("id"))
+	helper.PanicIfError(err)
+
+	controller.ClassService.Delete(request.Context(), classId)
+	webResponse := &web.WebResponse{
+		Code:   http.StatusOK,
+		Status: http.StatusText(http.StatusOK),
+	}
+
+	writer.WriteHeader(http.StatusOK)
+	helper.WriteToResponseBody(writer, webResponse)
 }
 func (controller *ClassControllerImpl) GetById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	classId, err := strconv.Atoi(params.ByName("id"))
@@ -78,5 +88,16 @@ func (controller *ClassControllerImpl) GetAll(writer http.ResponseWriter, reques
 	helper.WriteToResponseBody(writer, webResponse)
 }
 func (controller *ClassControllerImpl) GetStudentsById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	panic("not implemented") // TODO: Implement
+	classId, err := strconv.Atoi(params.ByName("id"))
+	helper.PanicIfError(err)
+
+	studentsResponse := controller.ClassService.FindStudentsById(request.Context(), classId)
+	webResponse := &web.WebResponse{
+		Code:   http.StatusOK,
+		Status: http.StatusText(http.StatusOK),
+		Data:   studentsResponse,
+	}
+
+	writer.WriteHeader(http.StatusOK)
+	helper.WriteToResponseBody(writer, webResponse)
 }
