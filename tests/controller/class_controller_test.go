@@ -195,11 +195,11 @@ func TestClassControllerGetStudentsByIdSuccess(t *testing.T) {
 	result, response := tests.SetupRequestAndRecorder(classRouter, nil, http.MethodGet, "classes/1/students")
 	expectedData := []any{
 		map[string]any{
-			"id":       students[0].Id,
+			"id":       float64(students[0].Id),
 			"name":     students[0].Name,
 			"email":    students[0].Email,
 			"active":   students[0].Active,
-			"semester": students[0].Semester,
+			"semester": float64(students[0].Semester),
 		},
 	}
 	expected := &web.WebResponse{
@@ -209,5 +209,21 @@ func TestClassControllerGetStudentsByIdSuccess(t *testing.T) {
 	}
 
 	assert.Equal(t, http.StatusOK, response.StatusCode)
+	assert.Equal(t, expected, result)
+}
+
+func TestClassControllerGetStudentsByIdFailed(t *testing.T) {
+	tx, db := tests.SetupTestDB()
+	defer tests.CleanUpTest(tx, db)
+	classRouter := tests.SetupTestRouter(db)
+
+	result, response := tests.SetupRequestAndRecorder(classRouter, nil, http.MethodGet, "classes/1/students")
+	expected := &web.WebResponse{
+		Code:   http.StatusNotFound,
+		Status: http.StatusText(http.StatusNotFound),
+		Data:   "Class with id: 1 was not found",
+	}
+
+	assert.Equal(t, http.StatusNotFound, response.StatusCode)
 	assert.Equal(t, expected, result)
 }
