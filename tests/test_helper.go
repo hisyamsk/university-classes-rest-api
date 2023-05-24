@@ -12,6 +12,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/hisyamsk/university-classes-rest-api/app"
 	"github.com/hisyamsk/university-classes-rest-api/app/db"
+	classController "github.com/hisyamsk/university-classes-rest-api/controller/class"
 	studentController "github.com/hisyamsk/university-classes-rest-api/controller/student"
 	"github.com/hisyamsk/university-classes-rest-api/entity"
 	"github.com/hisyamsk/university-classes-rest-api/helper"
@@ -108,6 +109,25 @@ func NewTestStudentController(db *sql.DB) studentController.StudentController {
 	return studentController
 }
 
+func NewTestClassController(db *sql.DB) classController.ClassController {
+	classService := NewTestClassService(db)
+	classController := classController.NewClassController(classService)
+
+	return classController
+}
+
+func SetupTestRouter(db *sql.DB) http.Handler {
+	studentController := NewTestStudentController(db)
+	classController := NewTestClassController(db)
+	routerHandler := &app.RouterHandler{
+		StudentController: studentController,
+		ClassController:   classController,
+	}
+	router := app.NewRouter(routerHandler)
+
+	return router
+}
+
 func SetupRequestAndRecorder(router http.Handler, body []byte, method, endpoint string) ([]byte, *http.Response) {
 	requestBody := strings.NewReader(string(body))
 	request := httptest.NewRequest(method, fmt.Sprintf("%s/%s", API_URL, endpoint), requestBody)
@@ -119,15 +139,4 @@ func SetupRequestAndRecorder(router http.Handler, body []byte, method, endpoint 
 	responseBody, _ := io.ReadAll(response.Body)
 
 	return responseBody, response
-}
-
-func SetupWoy(router http.Handler, body []byte, method, endpoint string) {
-	requestBody := strings.NewReader(string(body))
-	request := httptest.NewRequest(method, fmt.Sprintf("%s/%s", API_URL, endpoint), requestBody)
-	request.Header.Add("Content-Type", "application/json")
-	recorder := httptest.NewRecorder()
-
-	router.ServeHTTP(recorder, request)
-	// response := recorder.Result()
-	// io.ReadAll(response.Body)
 }

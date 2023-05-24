@@ -1,12 +1,10 @@
 package controller
 
 import (
-	"database/sql"
 	"encoding/json"
 	"net/http"
 	"testing"
 
-	"github.com/hisyamsk/university-classes-rest-api/app"
 	"github.com/hisyamsk/university-classes-rest-api/helper"
 	"github.com/hisyamsk/university-classes-rest-api/model/web"
 	webStudent "github.com/hisyamsk/university-classes-rest-api/model/web/student"
@@ -14,20 +12,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func setupTestStudentRouter(db *sql.DB) http.Handler {
-	studentController := tests.NewTestStudentController(db)
-	routerHandler := &app.RouterHandler{
-		StudentController: studentController,
-	}
-	router := app.NewRouter(routerHandler)
-
-	return router
-}
-
 func TestStudentControllerCreateSuccess(t *testing.T) {
 	tx, db := tests.SetupTestDB()
 	defer tests.CleanUpTest(tx, db)
-	studentRouter := setupTestStudentRouter(db)
+	studentRouter := tests.SetupTestRouter(db)
 	body, _ := json.Marshal(&webStudent.StudentCreateRequest{Name: "Hisyam", Email: "hisyam@email.com", Active: true, Semester: 7})
 
 	responseBody, response := tests.SetupRequestAndRecorder(studentRouter, body, http.MethodPost, "students")
@@ -53,7 +41,7 @@ func TestStudentControllerCreateSuccess(t *testing.T) {
 func TestStudentControllerCreateFailed(t *testing.T) {
 	tx, db := tests.SetupTestDB()
 	defer tests.CleanUpTest(tx, db)
-	studentRouter := setupTestStudentRouter(db)
+	studentRouter := tests.SetupTestRouter(db)
 	body, _ := json.Marshal(&webStudent.StudentCreateRequest{})
 
 	responseBody, response := tests.SetupRequestAndRecorder(studentRouter, body, http.MethodPost, "students")
@@ -74,7 +62,7 @@ func TestStudentControllerGetByIdSuccess(t *testing.T) {
 	tx, db := tests.SetupTestDB()
 	defer tests.CleanUpTest(tx, db)
 	students, _ := tests.PopulateStudentAndClassTable()
-	studentRouter := setupTestStudentRouter(db)
+	studentRouter := tests.SetupTestRouter(db)
 
 	responseBody, response := tests.SetupRequestAndRecorder(studentRouter, nil, http.MethodGet, "students/1")
 	var result *web.WebResponse
@@ -99,7 +87,7 @@ func TestStudentControllerGetByIdSuccess(t *testing.T) {
 func TestStudentControllerGetByIdFailed(t *testing.T) {
 	tx, db := tests.SetupTestDB()
 	defer tests.CleanUpTest(tx, db)
-	studentRouter := setupTestStudentRouter(db)
+	studentRouter := tests.SetupTestRouter(db)
 
 	responseBody, response := tests.SetupRequestAndRecorder(studentRouter, nil, http.MethodGet, "students/1")
 	var result *web.WebResponse
@@ -119,7 +107,7 @@ func TestStudentControllerUpdateSuccess(t *testing.T) {
 	tx, db := tests.SetupTestDB()
 	defer tests.CleanUpTest(tx, db)
 	students, _ := tests.PopulateStudentAndClassTable()
-	studentRouter := setupTestStudentRouter(db)
+	studentRouter := tests.SetupTestRouter(db)
 	body, _ := json.Marshal(&webStudent.StudentUpdateRequest{
 		Id:       students[0].Id,
 		Name:     "update",
@@ -151,7 +139,7 @@ func TestStudentControllerUpdateSuccess(t *testing.T) {
 func TestStudentControllerUpdateFailed(t *testing.T) {
 	tx, db := tests.SetupTestDB()
 	defer tests.CleanUpTest(tx, db)
-	studentRouter := setupTestStudentRouter(db)
+	studentRouter := tests.SetupTestRouter(db)
 	body, _ := json.Marshal(&webStudent.StudentUpdateRequest{
 		Id:       4,
 		Name:     "update",
@@ -177,7 +165,7 @@ func TestStudentControllerUpdateFailed(t *testing.T) {
 func TestStudentControllerDeleteSuccess(t *testing.T) {
 	tx, db := tests.SetupTestDB()
 	defer tests.CleanUpTest(tx, db)
-	studentRouter := setupTestStudentRouter(db)
+	studentRouter := tests.SetupTestRouter(db)
 	tests.PopulateStudentAndClassTable()
 
 	responseBody, response := tests.SetupRequestAndRecorder(studentRouter, nil, http.MethodDelete, "students/1")
@@ -197,7 +185,7 @@ func TestStudentControllerDeleteSuccess(t *testing.T) {
 func TestStudentControllerDeleteFailed(t *testing.T) {
 	tx, db := tests.SetupTestDB()
 	defer tests.CleanUpTest(tx, db)
-	studentRouter := setupTestStudentRouter(db)
+	studentRouter := tests.SetupTestRouter(db)
 
 	responseBody, response := tests.SetupRequestAndRecorder(studentRouter, nil, http.MethodDelete, "students/1")
 	var result *web.WebResponse
@@ -217,7 +205,7 @@ func TestStudentControllerGetAll(t *testing.T) {
 	tx, db := tests.SetupTestDB()
 	defer tests.CleanUpTest(tx, db)
 	students, _ := tests.PopulateStudentAndClassTable()
-	studentRouter := setupTestStudentRouter(db)
+	studentRouter := tests.SetupTestRouter(db)
 
 	responseBody, response := tests.SetupRequestAndRecorder(studentRouter, nil, http.MethodGet, "students")
 	var result *web.WebResponse
@@ -243,7 +231,7 @@ func TestStudentControllerGetClassesById(t *testing.T) {
 	tx, db := tests.SetupTestDB()
 	defer tests.CleanUpTest(tx, db)
 	_, classes := tests.PopulateEnrolledClassTable()
-	studentRouter := setupTestStudentRouter(db)
+	studentRouter := tests.SetupTestRouter(db)
 
 	responseBody, response := tests.SetupRequestAndRecorder(studentRouter, nil, http.MethodGet, "students/1/classes")
 	var result *web.WebResponse
@@ -266,7 +254,7 @@ func TestStudentControllerGetClassesById(t *testing.T) {
 func TestStudentControllerGetClassesByIdFailed(t *testing.T) {
 	tx, db := tests.SetupTestDB()
 	defer tests.CleanUpTest(tx, db)
-	studentRouter := setupTestStudentRouter(db)
+	studentRouter := tests.SetupTestRouter(db)
 
 	responseBody, response := tests.SetupRequestAndRecorder(studentRouter, nil, http.MethodGet, "students/1/classes")
 	var result *web.WebResponse
