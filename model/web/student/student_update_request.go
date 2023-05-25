@@ -1,7 +1,7 @@
 package student
 
 type StudentUpdateRequest struct {
-	Id       int    `validate:"required" json:"id"`
+	Id       int    `json:"id"`
 	Name     string `validate:"required,min=5,max=100" json:"name"`
 	Email    string `validate:"required,email" json:"email"`
 	Active   bool   `json:"active"`

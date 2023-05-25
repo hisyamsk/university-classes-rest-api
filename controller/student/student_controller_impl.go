@@ -32,12 +32,13 @@ func (controller *StudentControllerImpl) Create(writer http.ResponseWriter, requ
 		Data:   studentResponse,
 	}
 
-	writer.WriteHeader(http.StatusCreated)
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, webResponse, http.StatusCreated)
 }
 
 func (controller *StudentControllerImpl) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	studentUpdateRequest := &webStudent.StudentUpdateRequest{}
+	studentId, err := strconv.Atoi(params.ByName("id"))
+	helper.PanicIfError(err)
+	studentUpdateRequest := &webStudent.StudentUpdateRequest{Id: studentId}
 	helper.ReadFromRequestBody(request, studentUpdateRequest)
 
 	studentResponse := controller.StudentService.Update(request.Context(), studentUpdateRequest)
@@ -47,8 +48,7 @@ func (controller *StudentControllerImpl) Update(writer http.ResponseWriter, requ
 		Data:   studentResponse,
 	}
 
-	writer.WriteHeader(http.StatusOK)
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, webResponse, http.StatusOK)
 }
 
 func (controller *StudentControllerImpl) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
@@ -61,8 +61,7 @@ func (controller *StudentControllerImpl) Delete(writer http.ResponseWriter, requ
 		Status: http.StatusText(http.StatusOK),
 	}
 
-	writer.WriteHeader(http.StatusOK)
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, webResponse, http.StatusOK)
 }
 
 func (controller *StudentControllerImpl) GetById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
@@ -76,8 +75,7 @@ func (controller *StudentControllerImpl) GetById(writer http.ResponseWriter, req
 		Data:   studentResponse,
 	}
 
-	writer.WriteHeader(http.StatusOK)
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, webResponse, http.StatusOK)
 }
 
 func (controller *StudentControllerImpl) GetAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
@@ -88,8 +86,7 @@ func (controller *StudentControllerImpl) GetAll(writer http.ResponseWriter, requ
 		Data:   studentResponse,
 	}
 
-	writer.WriteHeader(http.StatusOK)
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, webResponse, http.StatusOK)
 }
 
 func (controller *StudentControllerImpl) GetClassesById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
@@ -103,6 +100,5 @@ func (controller *StudentControllerImpl) GetClassesById(writer http.ResponseWrit
 		Data:   studentResponse,
 	}
 
-	writer.WriteHeader(http.StatusOK)
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, webResponse, http.StatusOK)
 }

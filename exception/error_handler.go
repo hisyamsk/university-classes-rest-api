@@ -24,7 +24,6 @@ func validationError(writer http.ResponseWriter, request *http.Request, err any)
 	exception, ok := err.(validator.ValidationErrors)
 	if ok {
 		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusBadRequest)
 
 		webResponse := &web.WebResponse{
 			Code:   http.StatusBadRequest,
@@ -32,7 +31,7 @@ func validationError(writer http.ResponseWriter, request *http.Request, err any)
 			Data:   exception.Error(),
 		}
 
-		helper.WriteToResponseBody(writer, webResponse)
+		helper.WriteToResponseBody(writer, webResponse, http.StatusBadRequest)
 		return true
 	}
 
@@ -43,7 +42,6 @@ func notFoundError(writer http.ResponseWriter, request *http.Request, err any) b
 	exception, ok := err.(*NotFoundError)
 	if ok {
 		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusNotFound)
 
 		webResponse := &web.WebResponse{
 			Code:   http.StatusNotFound,
@@ -51,7 +49,7 @@ func notFoundError(writer http.ResponseWriter, request *http.Request, err any) b
 			Data:   exception.Error(),
 		}
 
-		helper.WriteToResponseBody(writer, webResponse)
+		helper.WriteToResponseBody(writer, webResponse, http.StatusNotFound)
 		return true
 	}
 
@@ -60,7 +58,6 @@ func notFoundError(writer http.ResponseWriter, request *http.Request, err any) b
 
 func internalServerError(writer http.ResponseWriter, request *http.Request, err any) {
 	writer.Header().Add("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusInternalServerError)
 
 	webResponse := &web.WebResponse{
 		Code:   http.StatusInternalServerError,
@@ -68,5 +65,5 @@ func internalServerError(writer http.ResponseWriter, request *http.Request, err 
 		Data:   err,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, webResponse, http.StatusInternalServerError)
 }
