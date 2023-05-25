@@ -31,6 +31,7 @@ import (
 const API_URL = "http://localhost:8000/api"
 
 func SetupTestDB() (*sql.Tx, *sql.DB) {
+	helper.LoadDotenv("../../.env")
 	database := db.NewDBConnection(app.DbNameTest)
 	tx, err := database.Begin()
 	helper.PanicIfError(err)
