@@ -16,13 +16,13 @@ func main() {
 	dbName := app.DbName
 	addr := os.Getenv("APP_ADDRESS")
 
-	router := server.InitializeServer(dbName)
-	server := &http.Server{
+	handler := server.InitializeHandler(dbName)
+	serverHandler := &http.Server{
 		Addr:    addr,
-		Handler: router,
+		Handler: handler,
 	}
 
 	fmt.Printf("listening on %s", addr)
-	err := server.ListenAndServe()
+	err := serverHandler.ListenAndServe()
 	helper.PanicIfError(err)
 }

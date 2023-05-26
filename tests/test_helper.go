@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
@@ -17,6 +18,7 @@ import (
 	studentController "github.com/hisyamsk/university-classes-rest-api/controller/student"
 	"github.com/hisyamsk/university-classes-rest-api/entity"
 	"github.com/hisyamsk/university-classes-rest-api/helper"
+	"github.com/hisyamsk/university-classes-rest-api/middleware"
 	"github.com/hisyamsk/university-classes-rest-api/model/web"
 	"github.com/hisyamsk/university-classes-rest-api/repository/class"
 	classRepository "github.com/hisyamsk/university-classes-rest-api/repository/class"
@@ -25,6 +27,7 @@ import (
 	studentRepository "github.com/hisyamsk/university-classes-rest-api/repository/student"
 	classService "github.com/hisyamsk/university-classes-rest-api/service/class"
 	studentService "github.com/hisyamsk/university-classes-rest-api/service/student"
+	"github.com/julienschmidt/httprouter"
 	_ "github.com/lib/pq"
 )
 
@@ -119,7 +122,7 @@ func NewTestClassController(db *sql.DB) classController.ClassController {
 	return classController
 }
 
-func SetupTestRouter(db *sql.DB) http.Handler {
+func SetupTestRouter(db *sql.DB) *httprouter.Router {
 	studentController := NewTestStudentController(db)
 	classController := NewTestClassController(db)
 	routerHandler := &app.RouterHandler{
@@ -131,13 +134,15 @@ func SetupTestRouter(db *sql.DB) http.Handler {
 	return router
 }
 
-func SetupRequestAndRecorder(router http.Handler, body []byte, method, endpoint string) (*web.WebResponse, *http.Response) {
+func SetupRequestAndRecorder(router *httprouter.Router, body []byte, method, endpoint string) (*web.WebResponse, *http.Response) {
 	requestBody := strings.NewReader(string(body))
 	request := httptest.NewRequest(method, fmt.Sprintf("%s/%s", API_URL, endpoint), requestBody)
+	request.Header.Add("X-API-Key", os.Getenv("API_KEY_SECRET"))
 	request.Header.Add("Content-Type", "application/json")
 	recorder := httptest.NewRecorder()
+	authMiddleware := middleware.NewAuthMiddleware(router)
 
-	router.ServeHTTP(recorder, request)
+	authMiddleware.ServeHTTP(recorder, request)
 	response := recorder.Result()
 	responseBody, _ := io.ReadAll(response.Body)
 	var result *web.WebResponse

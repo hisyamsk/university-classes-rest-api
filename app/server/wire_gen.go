@@ -13,16 +13,17 @@ import (
 	"github.com/hisyamsk/university-classes-rest-api/app/db"
 	class3 "github.com/hisyamsk/university-classes-rest-api/controller/class"
 	"github.com/hisyamsk/university-classes-rest-api/controller/student"
+	"github.com/hisyamsk/university-classes-rest-api/middleware"
 	"github.com/hisyamsk/university-classes-rest-api/repository/class"
 	"github.com/hisyamsk/university-classes-rest-api/repository/student"
 	class2 "github.com/hisyamsk/university-classes-rest-api/service/class"
 	student2 "github.com/hisyamsk/university-classes-rest-api/service/student"
-	"github.com/julienschmidt/httprouter"
+	"net/http"
 )
 
 // Injectors from injector.go:
 
-func InitializeServer(dbName string) *httprouter.Router {
+func InitializeHandler(dbName string) http.Handler {
 	studentRepositoryImpl := student.NewStudentRepository()
 	sqlDB := db.NewDBConnection(dbName)
 	validate := validator.New()
@@ -36,7 +37,8 @@ func InitializeServer(dbName string) *httprouter.Router {
 		ClassController:   classControllerImpl,
 	}
 	router := app.NewRouter(routerHandler)
-	return router
+	handler := middleware.NewAuthMiddleware(router)
+	return handler
 }
 
 // injector.go:
@@ -45,7 +47,7 @@ var classSet = wire.NewSet(class.NewClassRepositoryImpl, wire.Bind(new(class.Cla
 
 var studentSet = wire.NewSet(student.NewStudentRepository, wire.Bind(new(student.StudentRepository), new(*student.StudentRepositoryImpl)), student2.NewStudentService, wire.Bind(new(student2.StudentService), new(*student2.StudentServiceImpl)), controller.NewStudentController)
 
-var routerSet = wire.NewSet(
+var handlerSet = wire.NewSet(
 	studentSet,
-	classSet, wire.Bind(new(controller.StudentController), new(*controller.StudentControllerImpl)), wire.Bind(new(class3.ClassController), new(*class3.ClassControllerImpl)), wire.Struct(new(app.RouterHandler), "*"), app.NewRouter,
+	classSet, wire.Bind(new(controller.StudentController), new(*controller.StudentControllerImpl)), wire.Bind(new(class3.ClassController), new(*class3.ClassControllerImpl)), wire.Struct(new(app.RouterHandler), "*"), app.NewRouter, middleware.NewAuthMiddleware,
 )

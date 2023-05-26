@@ -4,17 +4,19 @@
 package server
 
 import (
+	"net/http"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/google/wire"
 	"github.com/hisyamsk/university-classes-rest-api/app"
 	"github.com/hisyamsk/university-classes-rest-api/app/db"
 	classController "github.com/hisyamsk/university-classes-rest-api/controller/class"
 	studentController "github.com/hisyamsk/university-classes-rest-api/controller/student"
+	"github.com/hisyamsk/university-classes-rest-api/middleware"
 	classRepository "github.com/hisyamsk/university-classes-rest-api/repository/class"
 	studentRepository "github.com/hisyamsk/university-classes-rest-api/repository/student"
 	classService "github.com/hisyamsk/university-classes-rest-api/service/class"
 	studentService "github.com/hisyamsk/university-classes-rest-api/service/student"
-	"github.com/julienschmidt/httprouter"
 )
 
 var classSet = wire.NewSet(
@@ -33,20 +35,21 @@ var studentSet = wire.NewSet(
 	studentController.NewStudentController,
 )
 
-var routerSet = wire.NewSet(
+var handlerSet = wire.NewSet(
 	studentSet,
 	classSet,
 	wire.Bind(new(studentController.StudentController), new(*studentController.StudentControllerImpl)),
 	wire.Bind(new(classController.ClassController), new(*classController.ClassControllerImpl)),
 	wire.Struct(new(app.RouterHandler), "*"),
 	app.NewRouter,
+	middleware.NewAuthMiddleware,
 )
 
-func InitializeServer(dbName string) *httprouter.Router {
+func InitializeHandler(dbName string) http.Handler {
 	wire.Build(
 		db.NewDBConnection,
 		validator.New,
-		routerSet,
+		handlerSet,
 	)
 	return nil
 }
