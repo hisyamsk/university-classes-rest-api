@@ -133,7 +133,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessDelete'
+                $ref: '#/components/schemas/SuccessCommon'
         404:
           description: Failed to delete student with id parameter due to id is non existent
           content:
@@ -317,7 +317,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessDelete'
+                $ref: '#/components/schemas/SuccessCommon'
         404:
           description: Failed to delete a class due to Id is non existent
           content:
@@ -378,6 +378,72 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
+
+  /enrolled-class:
+    post:
+      tags:
+        - "Enrolled Class"
+      summary: enroll a student to a class
+      requestBody:
+        $ref: '#/components/requestBodies/EnrolledClass'
+      responses:
+        201:
+          description: Success to create a new enrolled class
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessCommon'
+        400:
+          description: Failed to create enrolled class due to client's bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        404:
+          description: Failed to create enrolled class due to studentId and/or classId is non existent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        500:
+          description: Failed to create enrolled class due internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    delete:
+      tags:
+        - "Enrolled Class"
+      summary: Delete assigned student to a class
+      requestBody:
+        $ref: '#/components/requestBodies/EnrolledClass'
+      responses:
+        200:
+          description: Success to delete assigned studnet to a class
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessCommon'
+        400:
+          description: Failed to delete enrolled class due to client's bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        404:
+          description: Failed to delete enrolled class due to studentId and/or classId is non existent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        500:
+          description: Failed to delete enrolled class due internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+
 components:
   schemas:
     Students:
@@ -416,13 +482,13 @@ components:
         semester:
           type: number
 
-    EnrolledClasses:
+    EnrolledClass:
       type: object
       properties:
         studentId:
           type: number
-        studentName:
-          type: string
+        classId:
+          type: number
 
     Classes:
       type: object
@@ -456,7 +522,7 @@ components:
         endAt:
           type: string
 
-    SuccessDelete:
+    SuccessCommon:
       type: object
       properties:
         code:
@@ -527,3 +593,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/CreateOrUpdateClassRequest'
+    EnrolledClass:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EnrolledClass'
