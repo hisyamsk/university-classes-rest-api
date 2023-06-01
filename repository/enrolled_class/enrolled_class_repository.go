@@ -9,4 +9,6 @@ import (
 
 type EnrolledClassRepository interface {
 	Save(ctx context.Context, tx *sql.Tx, enrolledClass *entity.EnrolledClass) *entity.EnrolledClass
+	Delete(ctx context.Context, tx *sql.Tx, enrolledClass *entity.EnrolledClass)
+	Find(ctx context.Context, tx *sql.Tx, enrolledClass *entity.EnrolledClass) (*entity.EnrolledClass, error)
 }
