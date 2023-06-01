@@ -26,6 +26,7 @@ import (
 	"github.com/hisyamsk/university-classes-rest-api/repository/student"
 	studentRepository "github.com/hisyamsk/university-classes-rest-api/repository/student"
 	classService "github.com/hisyamsk/university-classes-rest-api/service/class"
+	enrolledClassService "github.com/hisyamsk/university-classes-rest-api/service/enrolled_class"
 	studentService "github.com/hisyamsk/university-classes-rest-api/service/student"
 	"github.com/julienschmidt/httprouter"
 	_ "github.com/lib/pq"
@@ -106,6 +107,14 @@ func NewTestStudentService(db *sql.DB) studentService.StudentService {
 	studentService := studentService.NewStudentService(studentRepository, db, validate)
 
 	return studentService
+}
+
+func NewTestEnrolledClassService(db *sql.DB) enrolledClassService.EnrolledClassService {
+	validate := validator.New()
+	enrolledClassRepository := enrolled_class.NewEnrolledClassRepository()
+	enrolledClassService := enrolledClassService.NewEnrolledClassService(db, enrolledClassRepository, validate)
+
+	return enrolledClassService
 }
 
 func NewTestStudentController(db *sql.DB) studentController.StudentController {
