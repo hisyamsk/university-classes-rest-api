@@ -15,6 +15,7 @@ import (
 	"github.com/hisyamsk/university-classes-rest-api/app"
 	"github.com/hisyamsk/university-classes-rest-api/app/db"
 	classController "github.com/hisyamsk/university-classes-rest-api/controller/class"
+	enrolledClassController "github.com/hisyamsk/university-classes-rest-api/controller/enrolled_class"
 	studentController "github.com/hisyamsk/university-classes-rest-api/controller/student"
 	"github.com/hisyamsk/university-classes-rest-api/entity"
 	"github.com/hisyamsk/university-classes-rest-api/helper"
@@ -131,12 +132,21 @@ func NewTestClassController(db *sql.DB) classController.ClassController {
 	return classController
 }
 
+func NewTestEnrolledClassController(db *sql.DB) enrolledClassController.EnrolledClassController {
+	enrolledClassService := NewTestEnrolledClassService(db)
+	enrolledClassController := enrolledClassController.NewEnrolledClassController(enrolledClassService)
+
+	return enrolledClassController
+}
+
 func SetupTestRouter(db *sql.DB) *httprouter.Router {
 	studentController := NewTestStudentController(db)
 	classController := NewTestClassController(db)
+	enrolledClassController := NewTestEnrolledClassController(db)
 	routerHandler := &app.RouterHandler{
-		StudentController: studentController,
-		ClassController:   classController,
+		StudentController:       studentController,
+		ClassController:         classController,
+		EnrolledClassController: enrolledClassController,
 	}
 	router := app.NewRouter(routerHandler)
 

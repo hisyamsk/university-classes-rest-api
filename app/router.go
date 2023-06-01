@@ -2,14 +2,16 @@ package app
 
 import (
 	classController "github.com/hisyamsk/university-classes-rest-api/controller/class"
+	"github.com/hisyamsk/university-classes-rest-api/controller/enrolled_class"
 	studentController "github.com/hisyamsk/university-classes-rest-api/controller/student"
 	"github.com/hisyamsk/university-classes-rest-api/exception"
 	"github.com/julienschmidt/httprouter"
 )
 
 type RouterHandler struct {
-	StudentController studentController.StudentController
-	ClassController   classController.ClassController
+	StudentController       studentController.StudentController
+	ClassController         classController.ClassController
+	EnrolledClassController enrolled_class.EnrolledClassController
 }
 
 func NewRouter(handler *RouterHandler) *httprouter.Router {
@@ -30,6 +32,9 @@ func NewRouter(handler *RouterHandler) *httprouter.Router {
 	router.PATCH("/api/classes/:id", handler.ClassController.Update)
 	router.DELETE("/api/classes/:id", handler.ClassController.Delete)
 	router.GET("/api/classes/:id/students", handler.ClassController.GetStudentsById)
+
+	router.POST("/api/enrolled-class", handler.EnrolledClassController.Create)
+	router.DELETE("/api/enrolled-class", handler.EnrolledClassController.Delete)
 
 	router.PanicHandler = exception.ErrorHandler
 
