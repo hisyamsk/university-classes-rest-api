@@ -11,11 +11,14 @@ import (
 	"github.com/hisyamsk/university-classes-rest-api/app"
 	"github.com/hisyamsk/university-classes-rest-api/app/db"
 	classController "github.com/hisyamsk/university-classes-rest-api/controller/class"
+	enrolledClassController "github.com/hisyamsk/university-classes-rest-api/controller/enrolled_class"
 	studentController "github.com/hisyamsk/university-classes-rest-api/controller/student"
 	"github.com/hisyamsk/university-classes-rest-api/middleware"
 	classRepository "github.com/hisyamsk/university-classes-rest-api/repository/class"
+	enrolledClassRepository "github.com/hisyamsk/university-classes-rest-api/repository/enrolled_class"
 	studentRepository "github.com/hisyamsk/university-classes-rest-api/repository/student"
 	classService "github.com/hisyamsk/university-classes-rest-api/service/class"
+	enrolledClassService "github.com/hisyamsk/university-classes-rest-api/service/enrolled_class"
 	studentService "github.com/hisyamsk/university-classes-rest-api/service/student"
 )
 
@@ -35,11 +38,21 @@ var studentSet = wire.NewSet(
 	studentController.NewStudentController,
 )
 
+var enrolledClassSet = wire.NewSet(
+	enrolledClassRepository.NewEnrolledClassRepository,
+	wire.Bind(new(enrolledClassRepository.EnrolledClassRepository), new(*enrolledClassRepository.EnrolledClassRepositoryImpl)),
+	enrolledClassService.NewEnrolledClassService,
+	wire.Bind(new(enrolledClassService.EnrolledClassService), new(*enrolledClassService.EnrolledClassServiceImpl)),
+	enrolledClassController.NewEnrolledClassController,
+)
+
 var handlerSet = wire.NewSet(
 	studentSet,
 	classSet,
+	enrolledClassSet,
 	wire.Bind(new(studentController.StudentController), new(*studentController.StudentControllerImpl)),
 	wire.Bind(new(classController.ClassController), new(*classController.ClassControllerImpl)),
+	wire.Bind(new(enrolledClassController.EnrolledClassController), new(*enrolledClassController.EnrolledClassControllerImpl)),
 	wire.Struct(new(app.RouterHandler), "*"),
 	app.NewRouter,
 	middleware.NewAuthMiddleware,
