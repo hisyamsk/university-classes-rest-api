@@ -35,10 +35,6 @@ func (service *EnrolledClassServiceImpl) Create(ctx context.Context, req *enroll
 	defer helper.CommitOrRollback(tx)
 
 	enrolledClassEntity := &entity.EnrolledClass{StudentId: req.StudentId, ClassId: req.ClassId}
-	_, findErr := service.Repository.Find(ctx, tx, enrolledClassEntity)
-	if findErr != nil {
-		panic(exception.NewNotFoundError(findErr.Error()))
-	}
 
 	service.Repository.Save(ctx, tx, enrolledClassEntity)
 }
