@@ -38,10 +38,12 @@ func InitializeHandler(dbName string) http.Handler {
 	enrolledClassRepositoryImpl := enrolled_class.NewEnrolledClassRepository()
 	enrolledClassServiceImpl := enrolled_class2.NewEnrolledClassService(sqlDB, enrolledClassRepositoryImpl, validate)
 	enrolledClassControllerImpl := enrolled_class3.NewEnrolledClassController(enrolledClassServiceImpl)
+	enrolledClassMiddlewareImpl := middleware.NewEnrolledClassMiddleware(classServiceImpl, studentServiceImpl)
 	routerHandler := &app.RouterHandler{
 		StudentController:       studentControllerImpl,
 		ClassController:         classControllerImpl,
 		EnrolledClassController: enrolledClassControllerImpl,
+		EnrolledClassMiddleware: enrolledClassMiddlewareImpl,
 	}
 	router := app.NewRouter(routerHandler)
 	handler := middleware.NewAuthMiddleware(router)
@@ -54,7 +56,7 @@ var classSet = wire.NewSet(class.NewClassRepositoryImpl, wire.Bind(new(class.Cla
 
 var studentSet = wire.NewSet(student.NewStudentRepository, wire.Bind(new(student.StudentRepository), new(*student.StudentRepositoryImpl)), student2.NewStudentService, wire.Bind(new(student2.StudentService), new(*student2.StudentServiceImpl)), controller.NewStudentController)
 
-var enrolledClassSet = wire.NewSet(enrolled_class.NewEnrolledClassRepository, wire.Bind(new(enrolled_class.EnrolledClassRepository), new(*enrolled_class.EnrolledClassRepositoryImpl)), enrolled_class2.NewEnrolledClassService, wire.Bind(new(enrolled_class2.EnrolledClassService), new(*enrolled_class2.EnrolledClassServiceImpl)), enrolled_class3.NewEnrolledClassController)
+var enrolledClassSet = wire.NewSet(enrolled_class.NewEnrolledClassRepository, wire.Bind(new(enrolled_class.EnrolledClassRepository), new(*enrolled_class.EnrolledClassRepositoryImpl)), enrolled_class2.NewEnrolledClassService, wire.Bind(new(enrolled_class2.EnrolledClassService), new(*enrolled_class2.EnrolledClassServiceImpl)), enrolled_class3.NewEnrolledClassController, middleware.NewEnrolledClassMiddleware, wire.Bind(new(middleware.EnrolledClassMiddleware), new(*middleware.EnrolledClassMiddlewareImpl)))
 
 var handlerSet = wire.NewSet(
 	studentSet,

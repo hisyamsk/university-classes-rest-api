@@ -44,6 +44,8 @@ var enrolledClassSet = wire.NewSet(
 	enrolledClassService.NewEnrolledClassService,
 	wire.Bind(new(enrolledClassService.EnrolledClassService), new(*enrolledClassService.EnrolledClassServiceImpl)),
 	enrolledClassController.NewEnrolledClassController,
+	middleware.NewEnrolledClassMiddleware,
+	wire.Bind(new(middleware.EnrolledClassMiddleware), new(*middleware.EnrolledClassMiddlewareImpl)),
 )
 
 var handlerSet = wire.NewSet(
