@@ -55,7 +55,7 @@ func TestEnrolledClassControllerDeleteFailed(t *testing.T) {
 	expected := &web.WebResponse{
 		Code:   http.StatusNotFound,
 		Status: http.StatusText(http.StatusNotFound),
-		Data:   "studentId or classId was not found!",
+		Data:   "Student with id: 99 was not found",
 	}
 
 	assert.Equal(t, http.StatusNotFound, response.StatusCode)

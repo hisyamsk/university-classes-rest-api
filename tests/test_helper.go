@@ -139,14 +139,24 @@ func NewTestEnrolledClassController(db *sql.DB) enrolledClassController.Enrolled
 	return enrolledClassController
 }
 
+func NewTestEnrolledClassMiddleware(db *sql.DB) middleware.EnrolledClassMiddleware {
+	classService := NewTestClassService(db)
+	studentService := NewTestStudentService(db)
+	enrolledClassMiddleware := middleware.NewEnrolledClassMiddleware(classService, studentService)
+
+	return enrolledClassMiddleware
+}
+
 func SetupTestRouter(db *sql.DB) *httprouter.Router {
 	studentController := NewTestStudentController(db)
 	classController := NewTestClassController(db)
 	enrolledClassController := NewTestEnrolledClassController(db)
+	enrolledClassMiddleware := NewTestEnrolledClassMiddleware(db)
 	routerHandler := &app.RouterHandler{
 		StudentController:       studentController,
 		ClassController:         classController,
 		EnrolledClassController: enrolledClassController,
+		EnrolledClassMiddleware: enrolledClassMiddleware,
 	}
 	router := app.NewRouter(routerHandler)
 
