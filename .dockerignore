@@ -1,0 +1,6 @@
+.git*
+.env
+tests
+Dockerfile*
+docker-compose.yml
+init.sql

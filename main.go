@@ -22,7 +22,7 @@ func main() {
 		Handler: handler,
 	}
 
-	fmt.Printf("listening on %s", addr)
+	fmt.Println("listening on port", addr)
 	err := serverHandler.ListenAndServe()
 	helper.PanicIfError(err)
 }
